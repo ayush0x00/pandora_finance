@@ -1,0 +1,16 @@
+Pandora Problem Statement [Confidential]
+
+Problem:  Rare digital assets are exploding day by day. Rare digital assets include digital arts, collectables, tweets, unique moment pics etc. However, it's challenging to prove the ownership of personal digital assets. In a centralised system, it's challenging to prove. Even if data is stored on some server, then also it can be manipulated since it's centralised.
+
+Solution: One common way to solve this problem is by converting them via NFT and storing it on IPFS.
+
+Design a marketplace & contract where a certain link can be converted to NFT. Link can be anything like:
+Hash of the digital picture stored on IPFS
+Tweets link done by any ordinary people.
+Screenshot link stored on Imgur.
+
+This contract should take the link of assets as a primary parameter for the NFT, and those NFT can be traded at any marketplace. Tokenized assets can be either in the ERC721 standard or ERC1155 standard.
+
+This contract should be deployed on any testnet of either Ethereum or BSC. The solution should be uploaded to the GitHub private repository and should be shared with the Pandora team within less than 5 days. Also, the given solution should contain the steps to reproduce on a local system.
+
+Applicants are expected to write a contract for it. If anyone can do some barebone UI to show the flow, then it would be a bonus.
