@@ -18,7 +18,7 @@ contract("Asset", (accounts) => {
       let asset;
       let result = [];
       for (var i = 0; i < totalSupply; i++) {
-        asset = await contract.asset(i);
+        asset = await contract.getAssetValue(i);
         result.push(asset);
       }
       let expected = ["#fded", "#fffv", "#fjnj"];
