@@ -24,5 +24,10 @@ contract("Asset", (accounts) => {
       let expected = ["#fded", "#fffv", "#fjnj"];
       assert.equal(expected.join(","), result.join(","));
     });
+    it("should not return value for not owner", async () => {
+      await contract.mint("#fdeded");
+      await contract.trade(accounts[1], 0, { from: accounts[0] });
+      await contract.getAssetValue("#fdeded").should.be.rejected;
+    });
   });
 });

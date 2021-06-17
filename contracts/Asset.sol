@@ -4,8 +4,8 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 contract Asset is ERC721{
   uint[] public asset;
-  mapping(uint=>string) assetValue;
-  mapping(string=>bool) assetExists;
+  mapping(uint=>string) private assetValue;
+  mapping(string=>bool) private assetExists;
 
   constructor() ERC721("Ayush asset","AT") public{ }
 
@@ -14,9 +14,6 @@ contract Asset is ERC721{
     return len;
   }
 
-  function getAsset(uint _idx) public view returns(uint){
-    return asset[_idx];
-  }
 
   function getAssetValue(uint _tokenId) public view returns(string memory){
     require(_isApprovedOrOwner(msg.sender,_tokenId),"Only owner can view the content");

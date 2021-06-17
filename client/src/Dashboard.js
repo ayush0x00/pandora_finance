@@ -8,6 +8,9 @@ const Dashboard = () => {
   const [totalSupply, setTotalSupply] = useState(0);
   const [assets, setAssets] = useState([]);
   const [assetValue, setAssetValue] = useState({});
+  const [mint, setMint] = useState(false);
+  const [transfer, setTransfer] = useState(false);
+  const [get, setGet] = useState(false);
   useEffect(() => {
     async function fetchData() {
       await loadWeb3();
@@ -29,9 +32,10 @@ const Dashboard = () => {
 
   const loadData = async () => {
     const web3 = window.web3;
-    const account = await web3.eth.getAccounts();
-    setAccount(account[0]);
+    const accounts = await web3.eth.getAccounts();
+    setAccount(accounts[0]);
     const netId = await web3.eth.net.getId();
+    //console.log(netId);
     const networkData = Asset.networks[netId];
     const abi = Asset.abi;
     const address = networkData.address;
@@ -42,7 +46,7 @@ const Dashboard = () => {
     setTotalSupply(supply);
     let asset = [];
     for (var i = 0; i < supply; i++) {
-      let res = await myContract.methods.getAsset(i).call();
+      let res = await myContract.methods.asset(i).call();
       asset.push(res);
     }
     setAssets(asset);
@@ -50,35 +54,49 @@ const Dashboard = () => {
 
   const handleMint = async (e) => {
     e.preventDefault();
-    await contract.methods.mint(e.target[0].value).send({ from: account });
+    try {
+      await contract.methods.mint(e.target[0].value).send({ from: account });
+    } catch (e) {
+      alert(e);
+    }
+    window.location.reload();
+    setMint(false);
   };
 
   const handleTransfer = async (e) => {
     e.preventDefault();
     const transferTo = e.target[0].value;
     const tokenId = e.target[1].value;
-    await contract.methods.trade(transferTo, tokenId).send({ from: account });
-    setAssetValue({
-      ...assetValue,
-      [tokenId]: "You are not the owner of this token",
-    });
+    try {
+      await contract.methods.trade(transferTo, tokenId).send({ from: account });
+      setAssetValue({
+        ...assetValue,
+        [tokenId]: "You are not the owner of this token",
+      });
+    } catch (e) {
+      alert(e);
+    }
+    setTransfer(false);
   };
 
   const handleGetValue = async (e) => {
+    console.log(assetValue);
     e.preventDefault();
     const idx = e.target[0].value;
     try {
-      const res = await contract.methods.getAssetValue(idx).call();
+      const owner = await contract.methods.ownerOf(idx).call();
+      const res = await contract.methods
+        .getAssetValue(idx)
+        .call({ from: account });
       setAssetValue({ ...assetValue, [idx]: res });
     } catch (e) {
+      console.log(e);
       setAssetValue({
         ...assetValue,
         [idx]: "You are not the owner of this token",
       });
-      alert("Only owner can view the content");
     }
-
-    // console.log(res);
+    setGet(false);
   };
 
   return (
@@ -108,8 +126,22 @@ const Dashboard = () => {
                 placeholder="Enter link"
               />
             </div>
-            <button type="submit" class="btn btn-primary btn-sm btn-block">
-              Mint
+            <button
+              class="btn btn-primary btn-block"
+              type="submit"
+              onClick={() => {
+                setMint(true);
+              }}
+            >
+              {mint ? (
+                <span
+                  class="spinner-grow spinner-grow-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+              ) : (
+                "Mint"
+              )}
             </button>
           </form>
         </div>
@@ -138,8 +170,22 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="container">
-              <button type="submit" class="btn btn-primary btn-sm btn-block">
-                Transfer
+              <button
+                class="btn btn-primary btn-block"
+                type="submit"
+                onClick={() => {
+                  setTransfer(true);
+                }}
+              >
+                {transfer ? (
+                  <span
+                    class="spinner-grow spinner-grow-sm btn-block"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                ) : (
+                  "Transfer"
+                )}
               </button>
             </div>
           </form>
@@ -156,8 +202,22 @@ const Dashboard = () => {
                 placeholder="Enter token id"
               />
             </div>
-            <button type="submit" class="btn btn-primary btn-sm btn-block">
-              Get value
+            <button
+              class="btn btn-primary btn-block"
+              type="submit"
+              onClick={() => {
+                setGet(true);
+              }}
+            >
+              {get ? (
+                <span
+                  class="spinner-grow spinner-grow-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+              ) : (
+                "Get value"
+              )}
             </button>
           </form>
         </div>
@@ -174,9 +234,9 @@ const Dashboard = () => {
               }}
               key={key}
             >
-              {a}
+              <p>{a}</p>
               <hr />
-              {assetValue[a] && <p>{assetValue[a]}</p>}
+              {assetValue[a] && <a href={assetValue[a]}>Your link</a>}
             </div>
           );
         })}
